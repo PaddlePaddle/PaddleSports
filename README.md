@@ -1,4 +1,4 @@
-PaddleSports介绍（9月份发布第一个完整版本）
+#PaddleSports介绍（9月份发布第一个完整版本）
 
 PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工智能技术与体育行业的深度融合，目标打造“AI+Sports”的标杆案例集。PaddleSports的特色如下：
 
