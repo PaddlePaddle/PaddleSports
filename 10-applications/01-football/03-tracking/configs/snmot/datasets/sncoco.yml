@@ -1,0 +1,34 @@
+metric: COCO
+num_classes: 1
+
+# Detection Dataset for training
+TrainDataset:
+  !COCODataSet
+    dataset_dir: ./dataset/snmot/SNMOT
+    anno_path: annotations/train.json
+    image_dir: images/train
+    data_fields: ['image', 'gt_bbox', 'gt_class', 'is_crowd']
+
+EvalDataset:
+  !COCODataSet
+    dataset_dir: ./dataset/snmot/SNMOT
+    anno_path: annotations/test.json
+    image_dir: images/test
+
+TestDataset:
+  !ImageFolder
+    dataset_dir: ./dataset/snmot/SNMOT
+    anno_path: annotations/test.json
+
+
+# MOTDataset for MOT evaluation and inference
+EvalMOTDataset:
+  !MOTImageFolder
+    dataset_dir: ./dataset/snmot
+    data_root: SNMOT/images/test
+    keep_ori_im: True # set as True in DeepSORT and ByteTrack
+
+TestMOTDataset:
+  !MOTImageFolder
+    dataset_dir: ./dataset/snmot
+    keep_ori_im: True # set True if save visualization images or video

@@ -1,0 +1,23 @@
+metric: MOT
+num_classes: 1
+
+# for MOT training
+TrainDataset:
+  !MOTDataSet
+    dataset_dir: ./dataset/snmot
+    image_lists: ['SNMOT.train']
+    data_fields: ['image', 'gt_bbox', 'gt_class', 'gt_ide']
+
+# for MOT evaluation
+# If you want to change the MOT evaluation dataset, please modify 'data_root'
+EvalMOTDataset:
+  !MOTImageFolder
+    dataset_dir: ./dataset/snmot
+    data_root: SNMOT/images/test
+    keep_ori_im: False # set True if save visualization images or video, or used in DeepSORT
+
+# for MOT video inference
+TestMOTDataset:
+  !MOTImageFolder
+    dataset_dir: ./dataset/snmot
+    keep_ori_im: True # set True if save visualization images or video
