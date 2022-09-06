@@ -1,0 +1,15 @@
+expname = bag_test
+basedir = ./logs
+datadir = ./data/nerf_llff_data/bag
+dataset_type = llff
+
+factor = 4
+llffhold = 8
+
+N_rand = 4096
+N_samples = 128
+N_importance = 128
+
+use_viewdirs = True
+raw_noise_std = 1e0
+

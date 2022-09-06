@@ -1,0 +1,16 @@
+model: log/log_aoanet_coco_rl/model_best.pdparams
+infos_path: log/log_aoanet_coco_rl/infos_aoanet_best.pkl
+
+input_json: data/cocotalk.json
+input_label_h5: data/cocotalk_label.h5
+input_fc_dir: data/cocobu_fc
+input_att_dir: data/cocobu_att
+input_box_dir: data/cocobu_box
+
+dump_images: 0
+dump_json: 1
+num_images: -1
+language_eval: 1
+beam_size: 3
+batch_size: 100
+split: test

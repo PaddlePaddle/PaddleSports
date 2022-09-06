@@ -1,0 +1,5 @@
+8/6 18:9:55 [trained_numstep: 100  lr: 0.000100] loss:1954.99829  epe:303.758142 
+8/6 18:12:17 [trained_numstep: 200  lr: 0.000100] loss:1905.04255  epe:301.371516 
+8/6 18:14:40 [trained_numstep: 300  lr: 0.000100] loss:1813.17810  epe:285.190323 
+8/6 18:17:4 [trained_numstep: 400  lr: 0.000100] loss:1840.00608  epe:289.550532 
+8/6 18:19:28 [trained_numstep: 500  lr: 0.000100] loss:1695.40976  epe:267.678470 

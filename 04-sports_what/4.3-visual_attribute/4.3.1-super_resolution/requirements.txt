@@ -1,0 +1,5 @@
+pyyaml >= 5.1
+opencv-python
+tqdm
+scipy
+ppgan

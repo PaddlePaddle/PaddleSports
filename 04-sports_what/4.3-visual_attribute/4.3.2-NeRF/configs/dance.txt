@@ -1,0 +1,13 @@
+expname = dance_test
+basedir = ./logs
+datadir = ./data/nerf_llff_data/Dance
+dataset_type = llff
+
+llffhold = 8
+
+N_rand = 1048
+N_samples = 64
+N_importance = 160
+
+use_viewdirs = True
+raw_noise_std = 1e0
