@@ -71,12 +71,12 @@ class STGCN_main():
                 optimizer.step()
 
 
-                self.log_writer.add_scalar(tag='train/loss', step=i, value=loss.numpy()[0])
-
+                # self.log_writer.add_scalar(tag='train/loss', step=i, value=loss.numpy()[0])
+                self.log_writer.add_scalar(tag='train/loss', step=i, value=float(loss))
 
                 if i%100 == 3:
-                    print("loss",loss.numpy()[0],v_acc_max)
-                    
+                    # print("loss",loss.numpy()[0],v_acc_max)
+                    print("loss",float(loss),v_acc_max)
                 i+=1
                 # break
 
@@ -84,7 +84,8 @@ class STGCN_main():
                 stgcn.eval()
                 v_acc = self.valid_accurary(valid_loader,stgcn)
                 stgcn.train()
-                print("epoch loss",loss.numpy()[0],v_acc)
+                # print("epoch loss",loss.numpy()[0],v_acc)
+                print("epoch loss",float(loss),v_acc)
                 self.log_writer.add_scalar(tag='train/v_acc', step=i, value=v_acc)
                 if v_acc > v_acc_max:
                     v_acc_max = v_acc
