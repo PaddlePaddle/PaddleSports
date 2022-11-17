@@ -20,7 +20,7 @@
 >
 >![img](https://ai-studio-static-online.cdn.bcebos.com/c660ff555b524c3fb3e233546299bfadb75e5dd0657549a1b93ad85f534a9eb4)
 >
->![img](https://ai-studio-static-online.cdn.bcebos.com/85611b318f2a4fe8b9478ae8e829837a5b8eca97f5e246c9b7de1f70e68918d1)
+>![](https://ai-studio-static-online.cdn.bcebos.com/7cf8c0e7e28a42e39368689f1f98046e5fb9614abcdb407a98484bcf0e2dadb0)
 
 
 
