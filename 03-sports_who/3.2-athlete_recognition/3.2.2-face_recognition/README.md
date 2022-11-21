@@ -1,5 +1,5 @@
 ## Face.Eval运动员主体人脸识别
-
+![](https://ai-studio-static-online.cdn.bcebos.com/ca19cb24b35847e6811a56f25ff98ff1bcee059e6cd74b2c9c07e0f8ea1dffd3)
 ## 简介
 
 通过这个repo，您可以使用自己的数据集构建训练自己的人脸检测模型。
@@ -8,6 +8,7 @@
 该库可以帮助研究人员/工程师快速开发深度人脸识别模型和算法，方便实际使用和开发部署
 
 * 运动员运动过程中识别效果
+
 
 [![img](https://ai-studio-static-online.cdn.bcebos.com/c231a51ac63a4f708371fa43db98787fb3637d64f4a04c4b88ee381f438f4738)](https://player.bilibili.com/player.html?aid=941024504&bvid=BV11W4y1m7Vc&cid=776635613&page=1)
 
