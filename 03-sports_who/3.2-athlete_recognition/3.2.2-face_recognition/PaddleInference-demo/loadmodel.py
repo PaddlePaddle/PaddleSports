@@ -4,8 +4,8 @@ import os
 
 def create_predictor(model_dir):
     # refer   https://paddle-inference.readthedocs.io/en/latest/api_reference/python_api_doc/Config/GPUConfig.html
-    model_file = os.path.join(model_dir,'.pdmodel')
-    params_file = os.path.join(model_dir,'.pdiparams')
+    model_file = model_dir + '.pdmodel'
+    params_file = model_dir + '.pdiparams'
     config = inference.Config()
     config.set_prog_file(model_file)
     config.set_params_file(params_file)
@@ -21,6 +21,8 @@ def create_predictor(model_dir):
     for output_name in output_names:
         output_handles.append(predictor.get_input_handle(output_name))
     print('model {} has {} inputs tensor {} outputs tensor'.format(model_dir, len(input_names), len(output_names)))
+    print('model inputs {}'.format(input_names))
+    print('model outputs {}'.format(output_names))
     return predictor, input_handles, output_handles
 
 
