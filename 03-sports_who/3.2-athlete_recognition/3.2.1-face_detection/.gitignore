@@ -1,6 +1,8 @@
-/__pycache__/
-/face_detection/
-
+__pycache__/
+dist/
+build/
+/Logs/
+*.pyc
 
 
 
