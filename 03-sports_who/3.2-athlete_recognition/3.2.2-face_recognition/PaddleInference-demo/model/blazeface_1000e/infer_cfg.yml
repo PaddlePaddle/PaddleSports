@@ -1,0 +1,20 @@
+mode: paddle
+draw_threshold: 0.5
+metric: WiderFace
+use_dynamic_shape: true
+arch: Face
+min_subgraph_size: 3
+Preprocess:
+- is_scale: false
+  mean:
+  - 123
+  - 117
+  - 104
+  std:
+  - 127.502231
+  - 127.502231
+  - 127.502231
+  type: NormalizeImage
+- type: Permute
+label_list:
+- face

@@ -9,8 +9,6 @@
 
 * 运动员运动过程中识别效果
 
-![](https://ai-studio-static-online.cdn.bcebos.com/ca19cb24b35847e6811a56f25ff98ff1bcee059e6cd74b2c9c07e0f8ea1dffd3)
-
 [![img](https://ai-studio-static-online.cdn.bcebos.com/c231a51ac63a4f708371fa43db98787fb3637d64f4a04c4b88ee381f438f4738)](https://player.bilibili.com/player.html?aid=941024504&bvid=BV11W4y1m7Vc&cid=776635613&page=1)
 
 ## 快速开始

@@ -13,9 +13,8 @@ def l2_norm(input, axis=0):
 
 
 class FaceRecognizer:
-    def __init__(self,model_path='./model/Backbone'):
+    def __init__(self,model_path='./model/backbones/Backbone'):
         self.threshold = 0.9
-
         # image preprocess
         self.mean = [127.5, 127.5, 127.5]
         self.std = [127.5, 127.5, 127.5]
@@ -103,8 +102,8 @@ class FaceRecognizer:
     @staticmethod
     def create_predictor(model_dir):
         # create predictor
-        model_file = os.path.join(model_dir, '.pdmodel')
-        params_file = os.path.join(model_dir, '.pdiparams')
+        model_file = model_dir + '.pdmodel'
+        params_file = model_dir + '.pdiparams'
         config = inference.Config()
         config.set_prog_file(model_file)
         config.set_params_file(params_file)
@@ -190,26 +189,33 @@ class FaceRecognizer:
         if boxes_c is not None:
             for i in range(boxes_c.shape[0]):
                 bbox = boxes_c[i, :4]
+
                 name = names[i]
+
                 prob = probs[i]
                 landmark = landmarks[i]
                 corpbbox = [int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])]
 
                 # landmark on face
-                # cv2.circle(img,(landmark[0],landmark[5]),radius=2,color=(255,0,0),thickness=2)
-                # cv2.circle(img, (landmark[6], landmark[1]), radius=2, color=(255, 0, 0), thickness=2)
-                # cv2.circle(img, (landmark[2], landmark[7]), radius=2, color=(255, 0, 0), thickness=2)
-                # cv2.circle(img, (landmark[3], landmark[8]), radius=2, color=(255, 0, 0), thickness=2)
-                # cv2.circle(img, (landmark[4], landmark[9]), radius=2, color=(255, 0, 0), thickness=2)
+                cv2.circle(img,(landmark[0],landmark[1]),radius=2,color=(255,0,0),thickness=2)
+                cv2.circle(img, (landmark[2], landmark[3]), radius=2, color=(255, 0, 0), thickness=2)
+                cv2.circle(img, (landmark[4], landmark[5]), radius=2, color=(255, 0, 0), thickness=2)
+                cv2.circle(img, (landmark[6], landmark[7]), radius=2, color=(255, 0, 0), thickness=2)
+                cv2.circle(img, (landmark[8], landmark[9]), radius=2, color=(255, 0, 0), thickness=2)
 
                 # face drawing rectangle
                 cv2.rectangle(img, (corpbbox[0], corpbbox[1]),
-                              (corpbbox[2], corpbbox[3]), (255, 0, 0), 2)
+                              (corpbbox[2], corpbbox[3]), (0, 255, 0), 2)
 
                 # font = cv2.FONT_HERSHEY_SIMPLEX  # 定义字体
                 # img = cv2.putText(img, name, (corpbbox[0], corpbbox[1]), font, 0.5, (0, 255, 0), 1)
-                text = name + ':' + str(prob)[:4]
-                img = self.add_text(img, text, corpbbox[0], corpbbox[1] + 25, color=(255, 255, 0), size=30)
+
+                # defined for Euclidean Distance
+                threshold = 0.9
+                threshold_weight = 0.4
+                prob = 100 * ((((threshold - prob)/threshold)**2)*threshold_weight+1-threshold_weight)
+                text = name + ':' + str(prob)[:4] + '%'
+                img = self.add_text(img, text, corpbbox[0], corpbbox[3], color=(255, 0, 255), size=30)
         cv2.imshow("visualization", img)
         cv2.waitKey(1)
         return img
@@ -217,14 +223,14 @@ class FaceRecognizer:
 
 if __name__ == '__main__':
     work_path = os.getcwd()
-    save_video = False
+    save_video = True
     print(work_path)
-    test = FaceRecognizer(model_path='./model/Backbone')
+    test = FaceRecognizer(model_path='./model/backbones/Backbone')
     test.load_face_data()
-    cap = cv2.VideoCapture('./demo/test.avi')
+    cap = cv2.VideoCapture('./demo/bzm.mp4')
     if save_video:
         # video = cv2.VideoWriter('result.avi', cv2.VideoWriter_fourcc('I', '4', '2', '0'), 20, (1280, 720))
-        video = cv2.VideoWriter('result.mp4', cv2.VideoWriter_fourcc(*'XVID'), 20, (1280, 720))
+        video = cv2.VideoWriter('result.mp4', cv2.VideoWriter_fourcc(*'XVID'), 25, (1280, 720))
     ret = True
     name_map = {}
 
