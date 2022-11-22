@@ -6,7 +6,7 @@
 * `PP-PicoDet`是PaddleDetection中提出的全新轻量级系列模型，在移动端具有卓越的性能。
 * 如果您想获得关于`PP-PicoDet`更详细的信息请转到[PaddleDetection/picodet](https://github.com/paddlepaddle/PaddleDetection/tree/release/2.4/configs/picodet)
 
-![](https://ai-studio-static-online.cdn.bcebos.com/7eed45beb265486083acd6ed5d81bbd12475b7bec2864814b5d431ff8ac07ec8)
+![](https://ai-studio-static-online.cdn.bcebos.com/1075c0b5cdba443c97cfb484248a14b76707710503d84a9195c0cf7e88cf1b90)
 
 ## 简介
 

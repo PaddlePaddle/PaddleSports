@@ -47,7 +47,6 @@ class Trainer(object):
         assert mode.lower() in ['train', 'eval', 'test'], \
             "mode should be 'train', 'eval' or 'test'"
         self.mode = mode.lower()
-        print('trainer mode : {}'.format(self.mode))
         self.optimizer = None
         self.is_loaded_weights = False
 
@@ -55,20 +54,9 @@ class Trainer(object):
 
         if self.mode == 'train':
             # use coco
-            self.dataset = COCODataSet(
-                dataset_dir=cfg['TrainDataset']['COCODataSet']['dataset_dir'],
-                image_dir=cfg['TrainDataset']['COCODataSet']['image_dir'],
-                anno_path=cfg['TrainDataset']['COCODataSet']['anno_path'],
-                data_fields=cfg['TrainDataset']['COCODataSet']['data_fields'],
-            )
+            self.dataset = COCODataSet(**cfg['TrainDataset']['COCODataSet'])
 
-            loader_ = TrainReader(
-                sample_transforms=cfg['TrainReader']['sample_transforms'],
-                batch_transforms=cfg['TrainReader']['batch_transforms'],
-                batch_size=cfg['TrainReader']['batch_size'],
-                shuffle=cfg['TrainReader']['shuffle'],
-                drop_last=cfg['TrainReader']['drop_last']
-            )
+            loader_ = TrainReader(**cfg['TrainReader'])
             self.loader = loader_(
                 dataset=self.dataset,
                 worker_num=cfg['worker_num']
@@ -79,14 +67,11 @@ class Trainer(object):
         if cfg['architecture'] == 'PicoDet':
             _architectures = getattr(architectures,'PicoDet','NONE')
             self.model = _architectures(
-                cfg = cfg,
-                backbone = cfg['PicoDet']['backbone'],
-                neck = cfg['PicoDet']['neck'],
-                head = cfg['PicoDet']['head']
+                cfg=cfg,
+                **cfg['PicoDet']
             )
 
         self.model.load_meanstd(cfg['TestReader']['sample_transforms'])
-
         self.use_ema = ('use_ema' in cfg and cfg['use_ema'])
         if self.use_ema:
             ema_decay = self.cfg.get('ema_decay', 0.9998)
@@ -102,23 +87,14 @@ class Trainer(object):
         # TODO: multi-device evaluate
         if self.mode == 'eval':
             # use coco
-            self.dataset = COCODataSet(
-                dataset_dir=cfg['EvalDataset']['COCODataSet']['dataset_dir'],
-                image_dir=cfg['EvalDataset']['COCODataSet']['image_dir'],
-                anno_path=cfg['EvalDataset']['COCODataSet']['anno_path']
-            )
+            self.dataset = COCODataSet(**cfg['EvalDataset']['COCODataSet'])
             self._eval_batch_sampler = paddle.io.BatchSampler(
                 self.dataset, batch_size=self.cfg['EvalReader']['batch_size'])
             reader_name = '{}Reader'.format(self.mode.capitalize())
             # If metric is VOC, need to be set collate_batch=False.
             if cfg['metric'] == 'VOC':
                 cfg[reader_name]['collate_batch'] = False
-            loader_ = EvalReader(
-                    sample_transforms=cfg['EvalReader']['sample_transforms'],
-                    batch_transforms=cfg['EvalReader']['batch_transforms'],
-                    batch_size=cfg['EvalReader']['batch_size'],
-                    shuffle=cfg['EvalReader']['shuffle']
-                )
+            loader_ = EvalReader(**cfg['EvalReader'])
             self.loader = loader_(
                 dataset=self.dataset,
                 worker_num=cfg['worker_num'],

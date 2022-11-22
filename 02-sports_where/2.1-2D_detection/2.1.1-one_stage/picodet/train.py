@@ -67,23 +67,6 @@ def run(args, cfg):
     trainer.train(args.eval)
 
 
-def print_cfg(cfg,rank):
-    if isinstance(cfg,dict):
-        for key,value in cfg.items():
-            if isinstance(value, dict) or isinstance(value,list):
-                print('{}{}:'.format(' '*rank,key))
-                print_cfg(value,rank+len(key))
-            else:
-                print('{}{}:{}'.format(' '*rank,key,value))
-    if isinstance(cfg,list):
-        for value in cfg:
-            if isinstance(value,dict):
-                print_cfg(value, rank)
-            else:
-                print('{}{}'.format(' ' * rank, cfg))
-            break
-
-
 def main():
     args = parse_args()
     cfg = load_config(args.config)
@@ -96,7 +79,6 @@ def main():
     if 'norm_type' in cfg and cfg['norm_type'] == 'sync_bn' and not cfg['use_gpu']:
         cfg['norm_type'] = 'bn'
 
-    # print_cfg(cfg,0)
 
     run(args, cfg)
 
