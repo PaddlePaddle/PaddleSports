@@ -49,20 +49,9 @@ class Trainer(object):
 
         if self.mode == 'train':
             # use coco
-            self.dataset = COCODataSet(
-                dataset_dir=cfg['TrainDataset']['COCODataSet']['dataset_dir'],
-                image_dir=cfg['TrainDataset']['COCODataSet']['image_dir'],
-                anno_path=cfg['TrainDataset']['COCODataSet']['anno_path'],
-                data_fields=cfg['TrainDataset']['COCODataSet']['data_fields'],
-            )
+            self.dataset = COCODataSet(**cfg['TrainDataset']['COCODataSet'])
 
-            loader_ = TrainReader(
-                sample_transforms=cfg['TrainReader']['sample_transforms'],
-                batch_transforms=cfg['TrainReader']['batch_transforms'],
-                batch_size=cfg['TrainReader']['batch_size'],
-                shuffle=cfg['TrainReader']['shuffle'],
-                drop_last=cfg['TrainReader']['drop_last']
-            )
+            loader_ = TrainReader(**cfg['TrainReader'])
             self.loader = loader_(
                 dataset=self.dataset,
                 worker_num=cfg['worker_num']
@@ -73,12 +62,10 @@ class Trainer(object):
         if cfg['architecture'] == 'YOLOv3':
             _architectures = getattr(architectures, 'YOLOv3', None)
             assert _architectures is not None, 'set architect failed'
+
             self.model = _architectures(
                 cfg=cfg,
-                backbone=cfg['YOLOv3']['backbone'],
-                neck=cfg['YOLOv3']['neck'],
-                yolo_head=cfg['YOLOv3']['yolo_head'],
-                post_process=cfg['YOLOv3']['post_process']
+                **cfg['YOLOv3']
             )
 
         self.model.load_meanstd(cfg['TestReader']['sample_transforms'])
@@ -97,21 +84,14 @@ class Trainer(object):
         # TODO: multi-device evaluate
         if self.mode == 'eval':
             # use coco
-            self.dataset = COCODataSet(
-                dataset_dir=cfg['EvalDataset']['COCODataSet']['dataset_dir'],
-                image_dir=cfg['EvalDataset']['COCODataSet']['image_dir'],
-                anno_path=cfg['EvalDataset']['COCODataSet']['anno_path']
-            )
+            self.dataset = COCODataSet(**cfg['EvalDataset']['COCODataSet'])
             self._eval_batch_sampler = paddle.io.BatchSampler(
                 self.dataset, batch_size=self.cfg['EvalReader']['batch_size'])
             reader_name = '{}Reader'.format(self.mode.capitalize())
             # If metric is VOC, need to be set collate_batch=False.
             if cfg['metric'] == 'VOC':
                 cfg[reader_name]['collate_batch'] = False
-            loader_ = EvalReader(
-                    sample_transforms=cfg['EvalReader']['sample_transforms'],
-                    batch_size=cfg['EvalReader']['batch_size']
-                )
+            loader_ = EvalReader(**cfg['EvalReader'])
             self.loader = loader_(
                 dataset=self.dataset,
                 worker_num=cfg['worker_num'],
