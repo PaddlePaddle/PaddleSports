@@ -1,0 +1,1 @@
+from modeling.architectures.faster_rcnn import *
