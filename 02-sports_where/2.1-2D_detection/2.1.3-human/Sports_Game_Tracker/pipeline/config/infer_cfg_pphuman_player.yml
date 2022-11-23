@@ -42,7 +42,7 @@ SKELETON_ACTION:
   display_frames: 80
   coord_size: [384, 512]
   basemode: "skeletonbased"
-  enable: False
+  enable: True
 
 ID_BASED_DETACTION:
   model_dir:  model/ppyoloe_crn_s_80e_person_football
@@ -51,7 +51,7 @@ ID_BASED_DETACTION:
   threshold: 0.6
   display_frames: 50
   skip_frame_num: 2
-  enable: True
+  enable: False
 
 ID_BASED_CLSACTION:
   model_dir: https://bj.bcebos.com/v1/paddledet/models/pipeline/PPHGNet_tiny_calling_halfbody.zip
@@ -66,4 +66,4 @@ REID:
   model_dir:  https://bj.bcebos.com/v1/paddledet/models/pipeline/reid_model.zip
   batch_size: 16
   basemode: "idbased"
-  enable: True
+  enable: False

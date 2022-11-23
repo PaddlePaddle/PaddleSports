@@ -20,6 +20,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 import math
+from PP_HumanSeg.src.infer import Predictor
 
 
 def visualize_box_mask(im, results, labels, threshold=0.5):
@@ -352,6 +353,8 @@ def visualize_singleplayer(im, results, name, boxes=None, singleplayer=None):
     im = cv2.imread(im) if isinstance(im, str) else im
     skeletons, scores = results['keypoint']
     skeletons = np.array(skeletons)
+    if define_id:
+        last_id = define_id
     for i, box in enumerate(boxes):
         left_v1 = skeletons[i][5][:-1] - skeletons[i][11][:-1]
         left_v2 = skeletons[i][11][:-1] - skeletons[i][13][:-1]
@@ -411,11 +414,157 @@ def visualize_singleplayer(im, results, name, boxes=None, singleplayer=None):
         re_skeletons.append(results['keypoint'][0][i])
         re_scores.append(results['keypoint'][1][i])
         index_vis.append(i)
-        if define_id:
-            last_id = define_id
         break
     im = visualize_pose(im, {'keypoint': [re_skeletons, re_scores]}, returnimg=True)
     return im, index_vis
+
+
+def visualize_player_rec(im, results):
+    OCR_res = results["result"]
+    mot_res = results["mot_res"]['boxes'].tolist()
+    text_scale = max(0.5, im.shape[0] / 3000.)
+    for i, res in enumerate(OCR_res):
+        cv2.putText(im,
+                    res,
+                    (int(mot_res[i][3]), int(mot_res[i][4])),
+                    cv2.FONT_ITALIC,
+                    text_scale, (0, 255, 255),
+                    thickness=2)
+        pass
+    return im
+
+
+def visualize_link_player(im, results):
+    crop_input = results["crop_input"]
+    results = results["result"]
+    for i, box in enumerate(results):
+        point = (int((box[0]+box[2]/2)), int(box[1]+box[3]))
+        axes = (int(box[2]/2), int(box[2]/4))
+        cv2.ellipse(im, point, axes, 0, 0, 360, (0, 0, 255), thickness=2)
+        for j in range(i, len(results)):
+            cv2.line(im,
+                     (int((results[i][0]+results[i][2]/2)), int(results[i][1]+results[i][3])),
+                     (int((results[j][0]+results[j][2]/2)), int(results[j][1]+results[j][3])),
+                     (0, 0, 255),
+                     thickness=2
+                     )
+        bg = im[int(box[1]):int(box[1]+box[3]), int(box[0]):int(box[0]+box[2])]
+        cv2.imwrite("crop_old.jpg", cv2.cvtColor(crop_input[i], cv2.COLOR_RGB2BGR))
+        cv2.imwrite("bg.jpg", bg)
+        # print(cv2.imread("crop_old.jpg").shape)
+        # print(cv2.imread("bg.jpg").shape)
+        out_im = predictor.run(cv2.imread("crop_old.jpg"), cv2.imread("bg.jpg"))
+        cv2.imwrite("result.jpg", out_im)
+        im[int(box[1]):int(box[1] + box[3]), int(box[0]):int(box[0] + box[2])] = out_im
+    return im
+
+
+class args_cls(object):
+    use_gpu = True
+    config = os.path.join('python', 'PP_HumanSeg', 'inference_models',
+                          'human_pp_humansegv1_server_512x512_inference_model_with_softmax', 'deploy.yaml')
+    vertical_screen = False
+    test_speed = True
+    use_post_process = True
+    use_optic_flow = True
+
+arg = args_cls()
+predictor = Predictor(arg)
+
+
+def visualize_golf(im, kpt):
+    boxes = kpt["bbox"]
+    box_area = []
+    for box in boxes:
+        box_area.append((box[1]-box[0])*(box[3]-box[2]))
+    single_index = box_area.index(max(box_area))
+    kpt = kpt["keypoint"][0]
+    for i, box in enumerate(boxes):
+        if i != single_index:
+            continue
+        kpt_now = kpt[i]
+        cv2.line(im,
+                 (int(box[0]), int(box[1])),
+                 (int(box[0]), int(box[3])),
+                 [0, 0, 255],
+                 thickness=3
+                 )
+        cv2.line(im,
+                 (int(box[2]), int(box[1])),
+                 (int(box[2]), int(box[3])),
+                 [0, 0, 255],
+                 thickness=3
+                 )
+        cv2.line(im,
+                 (int(kpt_now[5][0]), int(kpt_now[5][1])),
+                 (int(kpt_now[6][0]), int(kpt_now[6][1])),
+                 [0, 0, 255],
+                 thickness=3
+                 )
+        cv2.line(im,
+                 (int(kpt_now[11][0]), int(kpt_now[11][1])),
+                 (int(kpt_now[12][0]), int(kpt_now[12][1])),
+                 [0, 0, 255],
+                 thickness=3
+                 )
+        cv2.line(im,
+                 (int(kpt_now[5][0]+kpt_now[6][0])//2, int(kpt_now[5][1]+kpt_now[6][1])//2),
+                 (int(kpt_now[11][0]+kpt_now[12][0])//2, int(kpt_now[11][1]+kpt_now[12][1])//2),
+                 [0, 0, 255],
+                 thickness=3
+                 )
+    return im
+
+
+def visualize_ball(im, results):
+    results = results['res']
+    coef = np.polyfit(results[0], results[1], 3)
+    func_poly = np.poly1d(coef)
+    x = range(min(results[0]), max(results[0]))
+    y = func_poly(x)
+    for i, w in enumerate(x[:-1]):
+        cv2.line(im,
+                 (int(x[i]), int(y[i])),
+                 (int(x[i+1]), int(y[i+1])),
+                 [255, 255, 255],
+                 thickness=1
+                 )
+    return im
+
+
+def visualize_boating(im, results, boxes=None, index_list=None, singleplayer=None):
+    im = cv2.imread(im) if isinstance(im, str) else im
+    skeletons, scores = results['keypoint']
+    skeletons = np.array(skeletons)
+    for i, box in enumerate(boxes):
+        if index_list:
+            if i not in index_list:
+                continue
+        elif singleplayer:
+            continue
+        left_hand = skeletons[i][9][:-1]
+        right_hand = skeletons[i][10][:-1]
+        vector_1 = left_hand - right_hand
+        vector_2 = (1, 0)
+        vector_dot_product = np.dot(vector_1, vector_2)
+        arccos = np.arccos(vector_dot_product / (np.linalg.norm(vector_1) * np.linalg.norm(vector_2)))
+        angle = np.degrees(arccos)
+        text_scale = max(0.5, im.shape[0] / 3000.)
+        cv2.putText(
+            im,
+            "paddle angle:%.2f" % float(angle),
+            (int(box[2]), int(box[3])),
+            cv2.FONT_ITALIC,
+            text_scale * 1.2, (0, 255, 255),
+            thickness=2)
+        cv2.line(
+            im,
+            (int(left_hand[0]), int(left_hand[1])),
+            (int(right_hand[0]), int(right_hand[1])),
+            [255, 0, 255],
+            thickness=10
+        )
+    return im
 
 
 def visualize_attr(im, results, boxes=None):
@@ -571,6 +720,22 @@ def visualize_team(im, results, boxes=None):
                 team_color,
                 thickness=text_thickness*2
             )
+    return im
+
+
+def visualize_ball_control(im, res):
+    # ball_index = int(res["id"])
+    team_name = res["team"]
+    text_scale = max(1, im.shape[1] / 1000.)
+
+    cv2.putText(im,
+                team_name,
+                (im.shape[1]//2, 15),
+                cv2.FONT_HERSHEY_PLAIN,
+                text_scale,
+                (0, 0, 255),
+                2
+                )
     return im
 
 

@@ -322,6 +322,7 @@ def plot_tracking_dict(image,
                     text_scale,
                     color,
                     thickness=text_thickness)
+                pass
 
             if do_break_in_counting and in_region:
                 if not singleplayer:

@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import json
 import os
+import time
 import traceback
 
 import yaml
@@ -25,6 +26,7 @@ import sys
 import copy
 from collections import Sequence, defaultdict
 from datacollector import DataCollector, Result
+from queue import Queue
 
 # add deploy path of PadleDetection to sys.path
 
@@ -38,7 +40,7 @@ from python.infer import Detector, DetectorPicoDet
 from python.keypoint_infer import KeyPointDetector
 from python.keypoint_postprocess import translate_to_ori_images
 from python.preprocess import decode_image, ShortSizeScale
-from python.visualize import visualize_box_mask, visualize_attr, visualize_pose, visualize_action, visualize_speed, visualize_team, visualize_singleplayer
+from python.visualize import visualize_box_mask, visualize_attr, visualize_pose, visualize_action, visualize_speed, visualize_team, visualize_singleplayer, visualize_boating, visualize_ball, visualize_link_player, visualize_golf, visualize_player_rec, visualize_ball_control
 
 from pptracking.python.mot_sde_infer import SDE_Detector
 from pptracking.python.mot.visualize import plot_tracking_dict
@@ -50,6 +52,8 @@ from pphuman.action_infer import SkeletonActionRecognizer, DetActionRecognizer, 
 from pphuman.action_utils import KeyPointBuff, ActionVisualHelper
 from pphuman.reid import ReID
 from pphuman.mtmct import mtmct_process
+
+from numOCR.number_OCR import num_predictor
 
 from download import auto_download_model
 
@@ -277,10 +281,9 @@ class PipePredictor(object):
         region_type = args.region_type
         region_polygon = args.region_polygon
         speed_predict = args.speed_predict
-        mapping_ratio = args.mapping_ratio
-        x_ratio = args.x_ratio
-        y_ratio = args.y_ratio
-        team_clas = args.team_clas
+        self.player_recognize = args.player_recognize
+        if self.player_recognize:
+            self.id2num = {}
 
         # general module for pphuman and ppvehicle
         self.with_mot = cfg.get('MOT', False)['enable'] if cfg.get(
@@ -307,7 +310,7 @@ class PipePredictor(object):
                 'ID_BASED_CLSACTION', False) else False
         self.with_mtmct = cfg.get('REID', False)['enable'] if cfg.get(
             'REID', False) else False
-        if args.singleplayer:
+        if args.singleplayer or args.player_recognize:
             self.with_skeleton_action = True
 
         if self.with_skeleton_action:
@@ -320,7 +323,9 @@ class PipePredictor(object):
             print('IDBASED Classification Action Recognition enabled')
         if self.with_mtmct:
             print("MTMCT enabled")
-
+        if self.player_recognize:
+            print("player number OCR enabled")
+            self.player_OCR = num_predictor()
         # only for ppvehicle
         self.with_vehicleplate = cfg.get(
             'VEHICLE_PLATE', False)['enable'] if cfg.get('VEHICLE_PLATE',
@@ -357,7 +362,22 @@ class PipePredictor(object):
         self.y_ratio = args.y_ratio
         self.team_clas = args.team_clas
         self.singleplayer = args.singleplayer
-
+        self.boating = args.boating
+        self.ball_drawing = args.ball_drawing
+        self.link_player = args.link_player
+        self.ball_control = args.ball_control
+        if self.ball_control:
+            self.present_ball_id = []
+        self.loc_dir = args.loc_dir
+        self.show = args.show
+        self.golf = args.golf
+        if self.link_player or self.singleplayer or self.team_clas or self.golf:
+            self.no_box_visual = True
+        else:
+            self.no_box_visual = False
+        self.save_loc = args.save_loc
+        if self.save_loc:
+            self.loc_list = []
         self.warmup_frame = self.cfg['warmup_frame']
         self.pipeline_res = Result()
         self.pipe_timer = PipeTimer()
@@ -366,7 +386,7 @@ class PipePredictor(object):
 
         # auto download inference model
         model_dir_dict = get_model_dir(self.cfg)
-
+        # self.no_box_visual = True
         if not is_video:
             det_cfg = self.cfg['DET']
             model_dir = model_dir_dict['DET']
@@ -661,9 +681,12 @@ class PipePredictor(object):
         frame_id = 0
 
         entrance, records, center_traj = None, None, None
-        if self.draw_center_traj or self.speed_predict:
+        if self.draw_center_traj or self.speed_predict or self.ball_drawing:
             center_traj = [{}]
             speed_dict = {}
+
+        if self.team_clas:
+            id_team = {}
         id_set = set()
         interval_id_set = set()
         in_id_list = list()
@@ -722,6 +745,7 @@ class PipePredictor(object):
                 boxes, scores, ids = res[0]  # batch size = 1 in MOT
                 mot_result = (frame_id + 1, boxes[0], scores[0],
                               ids[0])  # single class
+                # json.dump(mot_result, open(str(frame_id+1)+".json", "w"))
                 statistic = flow_statistic(
                     mot_result, self.secs_interval, self.do_entrance_counting,
                     self.do_break_in_counting, self.region_type, video_fps,
@@ -731,25 +755,79 @@ class PipePredictor(object):
 
                 # nothing detected
                 if len(mot_res['boxes']) == 0:
+                    if self.save_loc:
+                        self.loc_list.append([])
                     frame_id += 1
                     if frame_id > self.warmup_frame:
                         self.pipe_timer.img_num += 1
                         self.pipe_timer.total_time.end()
                     if self.cfg['visual']:
                         _, _, fps = self.pipe_timer.get_total_time()
+
                         im = self.visualize_video(frame, mot_res, frame_id, fps,
                                                       entrance, records,
                                                       center_traj)  # visualize
+                        if self.ball_drawing:
+                            his_location = set()
+                            for i in center_traj[0].values():
+                                if len(i) <= 3:
+                                    continue
+                                else:
+                                    for loc in i:
+                                        his_location.add(loc)
+                            his_location = list(his_location)
+                            x = []
+                            y = []
+                            for i in his_location:
+                                x.append(i[0])
+                                y.append(i[1])
+                            his_location = {'res': [x, y]}
+                            if x:
+                                im = visualize_ball(im, his_location)
                         writer.write(im)
-                        if self.file_name is None:  # use camera_id
+                        if self.file_name is None or self.show:  # use camera_id
                             cv2.imshow('Paddle-Pipeline', im)
                             if cv2.waitKey(1) & 0xFF == ord('q'):
                                 break
                     continue
-
+                if self.save_loc:
+                    # print(scores)
+                    temp_index = list(scores).index(max(scores))
+                    self.loc_list.append(boxes[0][temp_index])
+                    # print(self.loc_list)
                 self.pipeline_res.update(mot_res, 'mot')
                 crop_input, new_bboxes, ori_bboxes = crop_image_with_mot(
                     frame_rgb, mot_res)
+
+                if self.link_player:
+                    link_boxes = []
+                    link_crop = []
+                    temp, boxes, scores, ids = mot_result
+                    crop_input, _, _ = crop_image_with_mot(
+                        frame_rgb, mot_res, expand=False)
+                    for i in range(len(ids)):
+                        if ids[i] in self.link_player:
+                            link_boxes.append(boxes[i])
+                            link_crop.append(crop_input[i])
+                    self.pipeline_res.update({"result": link_boxes, "crop_input": link_crop}, "link_player")
+
+                if self.ball_drawing:
+                    his_location = set()
+                    for i in center_traj[0].values():
+                        if len(i) <= 3:
+                            continue
+                        else:
+                            for loc in i:
+                                his_location.add(loc)
+                    his_location = list(his_location)
+                    x = []
+                    y = []
+                    for i in his_location:
+                        x.append(i[0])
+                        y.append(i[1])
+                    his_location = {'res': [x, y]}
+                    if x:
+                        self.pipeline_res.update(his_location, 'ball_drawing')
 
                 if self.speed_predict:
                     if frame_id > self.warmup_frame:
@@ -826,9 +904,13 @@ class PipePredictor(object):
                     team_result = []
                     crop_input_team, temp0, temp1 = crop_image_with_mot(
                         frame_rgb, mot_res, expand=False)
-
-                    for i in crop_input_team:
-                        ori_img = i
+                    index2id = {}
+                    temp, boxes, scores, ids = mot_result
+                    for i in range(len(ids)):
+                        temp_id = ids[i]
+                        index2id[i] = temp_id
+                    for i in range(len(crop_input_team)):
+                        ori_img = crop_input_team[i]
                         img = cv2.cvtColor(ori_img, cv2.COLOR_RGB2HSV)  # 转成HSV
                         color_img_0 = cv2.inRange(img, color[team_list[0][0]]["color_lower"],
                                                   color[team_list[0][0]]["color_upper"])  # 筛选出符合的颜色
@@ -839,11 +921,36 @@ class PipePredictor(object):
                         ratio_0 = img_class_0.count(255) / len(img_class_0)
                         ratio_1 = img_class_1.count(255) / len(img_class_1)
                         if ratio_0 > ratio_1 and ratio_0 > 0:
-                            team_result.append([team_list[0][1]])
+                            count = 0
                         elif ratio_1 > 0:
-                            team_result.append([team_list[1][1]])
+                            count = 1
                         else:
-                            team_result.append(['unknown'])
+                            count = -1
+                        if id_team.get(index2id[i]):
+                            re_team = id_team.get(index2id[i])
+                            if count == 1:
+                                id_team[index2id[i]] = [re_team[0], re_team[1] + 1, re_team[2]]
+                            elif count == 0:
+                                id_team[index2id[i]] = [re_team[0] + 1, re_team[1], re_team[2]]
+                            else:
+                                id_team[index2id[i]] = [re_team[0], re_team[1], re_team[2] + 1]
+                            team_index = id_team[index2id[i]].index(max(id_team[index2id[i]]))
+                            if team_index == 1:
+                                team_result.append([team_list[1][1]])
+                            elif team_index == 0:
+                                team_result.append([team_list[0][1]])
+                            else:
+                                team_result.append(['unknown'])
+                        else:
+                            if count == 1:
+                                id_team[index2id[i]] = [0, 1, 0]
+                                team_result.append([team_list[1][1]])
+                            elif count == 0:
+                                id_team[index2id[i]] = [1, 0, 0]
+                                team_result.append([team_list[0][1]])
+                            else:
+                                id_team[index2id[i]] = [0, 0, 1]
+                                team_result.append(['unknown'])
                     attr_res = {'output': team_result, 'color': {team_list[0][1]: team_list[0][0], team_list[1][1]: team_list[1][0]}}
                     self.pipeline_res.update(attr_res, 'team_clas')
 
@@ -930,6 +1037,112 @@ class PipePredictor(object):
                         self.skeleton_action_visual_helper.update(
                             skeleton_action_res)
 
+                if self.player_recognize:
+                    index2id = {}
+                    temp, boxes, scores, ids = mot_result
+                    for i in range(len(ids)):
+                        temp_id = ids[i]
+                        index2id[i] = temp_id
+                    if frame_id % 5 == 0:
+                        rec_input = []
+                        for i, kpt in enumerate(kpt_res["keypoint"][0]):
+                            x_min = int(min(kpt[5][0], kpt[6][0], kpt[11][0], kpt[12][0]))
+                            x_max = int(max(kpt[5][0], kpt[6][0], kpt[11][0], kpt[12][0]))
+                            y_min = int(min(kpt[5][1], kpt[6][1], kpt[11][1], kpt[12][1]))
+                            y_max = int(max(kpt[5][1], kpt[6][1], kpt[11][1], kpt[12][1]))
+                            box = [x_min, x_max, y_min, y_max]
+                            for j in range(2):
+                                if box[j] < 0:
+                                    box[j] = 0
+                                if box[j] >= frame.shape[0]:
+                                    box[j] = frame.shape[0] - 1
+                            for j in range(2, 4):
+                                if box[j] < 0:
+                                    box[j] = 0
+                                if box[j] >= frame.shape[1]:
+                                    box[j] = frame.shape[1] - 1
+                            if box[0] == box[1]:
+                                box[1] += 1
+                            if box[2] == box[3]:
+                                box[3] += 1
+                            rec_input.append(frame[box[2]:box[3], box[0]:box[1], :])
+                        OCR_res = self.player_OCR.predict(rec_input)
+                        update_res = []
+                        for i, res in enumerate(OCR_res):
+                            res = res[0]
+                            text = ""
+                            if res.isdigit() and int(res) != 1:
+                                text = int(res)
+                                # cv2.imwrite(res+".jpg", rec_input[i])
+                            player_mot_id = index2id[i]
+                            if text != '':
+                                if self.id2num.get(player_mot_id):
+                                    if text not in self.id2num[player_mot_id]:
+                                        self.id2num[player_mot_id][text] = 1
+                                    else:
+                                        self.id2num[player_mot_id][text] += 1
+                                else:
+                                    self.id2num[player_mot_id] = {text: 1}
+                            num_dict = self.id2num.get(player_mot_id)
+                            if num_dict:
+                                text = list(num_dict.keys())[list(num_dict.values()).index(max(num_dict.values()))]
+                            else:
+                                text = ""
+                            update_res.append(str(text))
+
+                            # cv2.imwrite("%d-%d.png" % (frame_id, i), crop_input[i])
+                            self.pipeline_res.update({"result": update_res, "mot_res": mot_res}, "player_rec")
+                        # print(OCR_res)
+                    else:
+                        update_res = []
+                        for i, kpt in enumerate(kpt_res["keypoint"][0]):
+                            player_mot_id = index2id[i]
+                            num_dict = self.id2num.get(player_mot_id)
+                            if num_dict:
+                                text = list(num_dict.keys())[list(num_dict.values()).index(max(num_dict.values()))]
+                            else:
+                                text = ""
+                            update_res.append(str(text))
+                            self.pipeline_res.update({"result": update_res, "mot_res": mot_res}, "player_rec")
+
+                if self.ball_control:
+                    if self.loc_dir:
+                        loc_info = np.load(self.loc_dir, allow_pickle=True)
+                        loc_info = loc_info[frame_id]
+
+                    ball_id = -1
+                    ball_score = -1
+                    for info in det_action_res:
+                        if info[1]["class"] == 1:
+                            continue
+                        if ball_id == -1:
+                            ball_id = info[0]
+                            ball_score = info[1]["score"]
+                        else:
+                            if ball_score <= info[1]["score"]:
+                                ball_id = info[0]
+                                ball_score = info[1]["score"]
+                    if ball_id != -1:
+                        self.present_ball_id.append([ball_id, ball_score])
+                    ball_score = -1
+                    for i in self.present_ball_id[-5:]:
+                        if ball_score <= i[1]:
+                            ball_id = i[0]
+                    team_index = id_team[ball_id].index(max(id_team[ball_id]))
+                    if team_index == 1:
+                        team_name = team_list[1][1]
+                    elif team_index == 0:
+                        team_name = team_list[0][1]
+                    else:
+                        team_name = 'unknown'
+                    # for i in ids:
+                    #     if ball_id == ids[i]:
+                    #         ball_index = i
+                    #         break
+                    # ball_control_res = {"id": ball_index, "team": team_name, "box":()}
+                    ball_control_res = {"team": team_name}
+                    self.pipeline_res.update(ball_control_res, "ball_control")
+
                 if self.with_mtmct and frame_id % 10 == 0:
                     crop_input, img_qualities, rects = self.reid_predictor.crop_image_with_mot(
                         frame_rgb, mot_res)
@@ -987,7 +1200,6 @@ class PipePredictor(object):
                 self.pipe_timer.img_num += 1
                 self.pipe_timer.total_time.end()
             frame_id += 1
-
             if self.cfg['visual']:
                 _, _, fps = self.pipe_timer.get_total_time()
                 im = self.visualize_video(frame, self.pipeline_res, frame_id,
@@ -998,6 +1210,9 @@ class PipePredictor(object):
                     cv2.imshow('Paddle-Pipeline', im)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
+        if self.save_loc:
+            np.array(self.loc_list).dump("loc_info.npy")
+
         writer.release()
         print('save result to {}'.format(out_path))
 
@@ -1046,7 +1261,7 @@ class PipePredictor(object):
                 records=records,
                 center_traj=center_traj,
                 draw_center_traj=self.draw_center_traj,
-                singleplayer=self.singleplayer
+                singleplayer=self.no_box_visual
             )
 
         index_list = None
@@ -1061,6 +1276,37 @@ class PipePredictor(object):
                 result.get('singleplayer')
             )
 
+        player_res = result.get("player_rec")
+        if self.player_recognize and player_res:
+            image = visualize_player_rec(image, player_res)
+
+        ball_res = result.get('ball_drawing')
+        if self.ball_drawing and ball_res:
+            image = visualize_ball(image, ball_res)
+
+        link_res = result.get('link_player')
+        if self.link_player and link_res:
+            image = visualize_link_player(image, link_res)
+
+        kpt = result.get('kpt')
+        if self.golf:
+            image = visualize_golf(image, kpt)
+
+        boating_res = result.get('kpt')
+        if boating_res and self.boating:
+            boxes = mot_res['boxes'][:, 1:]
+            image = visualize_boating(
+                image,
+                boating_res,
+                boxes,
+                index_list,
+                self.singleplayer
+            )
+
+        ball_control_res = result.get("ball_control")
+        if self.ball_control and ball_control_res:
+            image = visualize_ball_control(image, ball_control_res)
+
         human_attr_res = result.get('attr')
         if human_attr_res is not None:
             boxes = mot_res['boxes'][:, 1:]
@@ -1069,7 +1315,7 @@ class PipePredictor(object):
             image = np.array(image)
 
         kpt_res = result.get('kpt')
-        if (kpt_res is not None) and (not self.singleplayer):
+        if (kpt_res is not None) and (not self.singleplayer) and (not self.golf) and (not self.player_recognize):
             image = visualize_pose(
                 image,
                 kpt_res,
@@ -1127,10 +1373,10 @@ class PipePredictor(object):
             image = visualize_action(image, mot_res['boxes'],
                                      visual_helper_for_display,
                                      action_to_display)
-
-        cv2.imshow('Paddle-Pipeline', image)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            pass
+        if self.show:
+            cv2.imshow('Paddle-Pipeline', image)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                pass
         return image
 
     def visualize_image(self, im_files, images, result):

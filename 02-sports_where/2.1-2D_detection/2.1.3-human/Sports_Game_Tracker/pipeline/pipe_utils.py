@@ -176,6 +176,50 @@ def argsparser():
         type=str,
         default="",
         help="using the single player mode, input a str as name of the player")
+    parser.add_argument(
+        "--boating",
+        action='store_true',
+        help="showing the angle of the paddle")
+    parser.add_argument(
+        "--ball_drawing",
+        action='store_true',
+        help="Draw the smooth curve of the ball")
+    parser.add_argument(
+        "--link_player",
+        nargs='+',
+        type=float,
+        default=[],
+        help="hightlight and link the player of given id")
+    parser.add_argument(
+        "--golf",
+        type=bool,
+        default=False,
+        help="golf style analysis")
+    parser.add_argument(
+        "--player_recognize",
+        type=bool,
+        default=False,
+        help="whether recognize number of player")
+    parser.add_argument(
+        "--ball_control",
+        type=bool,
+        default=False,
+        help="whether display ball control team")
+    parser.add_argument(
+        "--show",
+        type=bool,
+        default=False,
+        help="whether display real-time image")
+    parser.add_argument(
+        "--save_loc",
+        type=bool,
+        default=False,
+        help="whether save ball location")
+    parser.add_argument(
+        "--loc_dir",
+        type=str,
+        default=None,
+        help="Dir of location info file.")
     return parser
 
 
