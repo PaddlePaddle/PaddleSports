@@ -1,0 +1,4 @@
+
+
+
+python src/seg_demo.py --config inference_models/portrait_pp_humansegv2_lite_256x144_inference_model/deploy.yaml --img_path "C:\Users\boyif\Desktop\paddle\football\pic\1-1.png" --save_dir output/1.jpg

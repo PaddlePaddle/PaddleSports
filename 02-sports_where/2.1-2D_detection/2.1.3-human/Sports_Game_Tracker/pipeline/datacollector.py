@@ -33,6 +33,10 @@ class Result(object):
             'speed_predict': dict(),
             'team_clas': dict(),
             'singleplayer': dict(),
+            'ball_drawing': dict(),
+            'link_player': dict(),
+            'player_rec': dict(),
+            'ball_control': dict(),
         }
 
     def update(self, res, name):

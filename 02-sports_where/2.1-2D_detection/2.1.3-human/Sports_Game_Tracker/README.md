@@ -1,12 +1,26 @@
-# Sports_Game_tracker 体育赛事多主体识别追踪
+# Sports_Game_tracker 体育赛事视频识别追踪工具集
 
-**Sports_Game_tracker是基于飞桨深度学习框架的实时行人分析工具[PP-Human](https://github.com/PaddlePaddle/PaddleDetection/tree/develop/deploy/pipeline)进行功能扩展的赛事识别追踪工具，目前的功能有：运动员追踪、足球控球检测、足球检测、动作关键点检测、运动速度粗算、球员队伍分类、单人环境过滤**
+**Sports_Game_tracker是基于飞桨深度学习框架的实时行人分析工具[PP-Human](https://github.com/PaddlePaddle/PaddleDetection/tree/develop/deploy/pipeline)进行功能扩展的赛事识别追踪工具集，目前的功能有：运动员追踪、足球控球检测、足球检测、动作关键点检测、运动速度粗算、球员队伍分类、单人环境过滤、划船姿态、滑雪姿态、球员高亮、球类飞行轨迹拟合等**
+
+OpenI启智平台链接：[Learning-Develop-Union/Sports_Game_tracker: Sports_Game_tracker](https://git.openi.org.cn/Learning-Develop-Union/Sports_Game_tracker)
+
+Github链接：[KirigiriSuzumiya/Sports_Game_Tracker: Sports_Game_tracker](https://github.com/KirigiriSuzumiya/Sports_Game_Tracker)
+
+|          功能          |                            效果图                            |                所需模型                |
+| :--------------------: | :----------------------------------------------------------: | :------------------------------------: |
+|   **球员与足球追踪**   |         ![test-tracker](README.assets/football.gif)          |           球员检测、足球检测           |
+|   **球员高亮与链接**   | ![SNMOT-021 00_00_05-00_00_11](README.assets/highlight.gif)  |           球员检测、人像分割           |
+|  **球类飞行轨迹拟合**  |               ![ball](README.assets/ball.gif)                |                足球检测                |
+|      **球队分类**      |          ![team_clas](README.assets/team_clas.gif)           |                球员检测                |
+|  新！**球员号码识别**  | <img src="README.assets/player_ocr.gif" alt="player_ocr" style="zoom: 67%;" /> | 球员检测、骨骼关键点检测、光学字符识别 |
+| **滑雪姿态与单人过滤** |             <img src="README.assets/ski.gif"  />             |        球员检测、骨骼关键点检测        |
+| **划船姿态与船桨角度** |               ![boat](README.assets/boat.gif)                |        球员检测、骨骼关键点检测        |
+| **高尔夫肩髋动作纠正** |               ![golf](README.assets/golf.gif)                |        球员检测、骨骼关键点检测        |
+|   **更多功能与想法**   |        **更多功能锐意开发中~欢迎大家提出需求！！！**         |                   ……                   |
 
 
 
-![test-tracker](https://ai-studio-static-online.cdn.bcebos.com/38361420e9864640be9af89c1f8b389f1207a5c7e79e49908c958a93d1a436ea)
-![](https://ai-studio-static-online.cdn.bcebos.com/6f733129eb954b9f905dd5690f14eedc010d315c034947cca9ea4def5572becf)
-![](https://ai-studio-static-online.cdn.bcebos.com/d663f0c13e1d4e2c876dd30975dfa945f5d848c89bce456fb60a9bf7d1ac980d)
+或者有**B站视频**展示：[为体育赛事动态可视而生！基于PP-Human的体育视频追踪工具集](https://www.bilibili.com/video/BV1LG4y1n7LV) 
 
 ## 1. 快速开始
 
@@ -20,10 +34,6 @@ python -m pip install paddlepaddle-gpu==2.2.2.post101 -f https://www.paddlepaddl
 
 # PaddlePaddle CPU
 python -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple
-
-# 克隆Sports_Game_tracker仓库
-cd <path/to/clone/Sports_Game_tracker>
-git clone https://github.com/KirigiriSuzumiya/Sports_Game_Tracker.git
 
 # 安装其他依赖
 cd Sports_Game_tracker
@@ -94,6 +104,10 @@ python pipeline\pipeline.py --config pipeline/config/infer_cfg_pphuman_ski.yml -
 | --y_ratio       | Option   | y轴像素分段实际距离对应，每三个参数为一组。(y1,y2,dis)代表x1与x2之间映射x轴实际距离dis。需先开启`--speed_predict`如：`--y_ratio 23 45.5 5 `代表23到45.5之间实际距离为5米 |
 | --team_clas     | Option   | 基于颜色识别的运动员球队分类，接受4个字符串变量（color1,name1,color2,name2）。其中颜色接受的参数为：[black, white, blue, red, yellow, green, purple, orange]。如：`--team_clas white RMA red LIV` |
 | --singleplayer  | Option   | 是否开启单人过滤，默认为None，输入一个字符串代表运动员名称，主要过滤站立的观众。如：`--singleplayer ZhangSan` |
+| --boating       | Option   | 划船场景功能，默认为False，可用于测算手持船桨的角度          |
+| --ball_drawing  | Option   | 统计全局球类检测结果，不分id得进行路径拟合，默认为False      |
+| --link_player   | Option   | 高亮并连接给定id号的运动员，类似电视转播的效果，默认为False  |
+| --golf          | Option   | 是否开启高尔夫肩髋动作纠正，默认为False                      |
 
 PP-Human原有的参数：
 
@@ -118,9 +132,7 @@ PP-Human原有的参数：
 
 
 
-## 3. 模型训练与二次开发
-
-**Sports_Game_tracker**由**PP-Human**二次开发而来，可视化功能扩展教程等可参阅：[利用PP-Human完成足球赛追踪二次开发](../../../../10-applications/01-football/PP-Human_football/README.md)
+## 3. 模型训练
 
 ### 3.1 足球追踪
 
@@ -217,13 +229,3 @@ PPYOLOEHead:
 使用PP-Human的默认行人追踪模型
 
 [PP-YOLOE Human 检测模型](https://github.com/PaddlePaddle/PaddleDetection/tree/develop/configs/pphuman)
-
-
-
-## 4. 贡献者与问题
-
-AIstudio主页：[链接](https://aistudio.baidu.com/aistudio/personalcenter/thirdview/1033059) 
-
-面临的问题：足球小目标检测效果待优化，后续可能改用PPYOLOE的小目标检测专版
-
- 
