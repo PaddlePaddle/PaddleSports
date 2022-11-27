@@ -60,7 +60,7 @@ python  train.py -c configs/mask_rcnn_r50_1x_coco.yml --amp
 CUDA_VISIBLE_DEVICES=0 python eval.py -c configs/mask_rcnn_r50_1x_coco.yml -w your weights
 ```
 
-在coco test-dev2017上评估，请先从[COCO数据集下载](https://cocodataset.org/#download)下载COCO test-dev2017数据集，然后解压到COCO数据集文件夹并像`configs/ppyolo/ppyolo_test.yml`一样配置`EvalDataset`。
+在coco test-dev2017上评估，请先从[COCO数据集下载](https://cocodataset.org/#download)下载COCO test-dev2017数据集，然后解压到COCO数据集文件夹并配置`EvalDataset`。
 
 
 ### 推理测试
