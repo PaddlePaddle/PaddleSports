@@ -19,6 +19,11 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 1. [*when*](./01-sports_when/)
+
+<div align="center">
+  <img src="./image/乒乓球.gif" width="550px"/><br>
+</div>
+
 &emsp; “when”模块重点从时域角度回答以下问题：
 
 &emsp; 1）输入一段视频，首先判断是什么体育运动；
