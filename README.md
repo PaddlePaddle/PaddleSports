@@ -19,11 +19,11 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 1. [*when*](./01-sports_when/)
-:movie_camera:demo加载中: [下载](./image/)
+:movie_camera:示例demo加载中: [下载](./image/)
 <div align="center">
   <img src="./image/乒乓球.gif" width="550px"/><br>
 </div>
-示例截图:
+示例动作识别截图:
 <div align="center">
   <img src="./image/乒乓球.png" width="550px"/><br>
 </div>
@@ -61,9 +61,10 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 2. [*where*](./02-sports_where/)
-demo加载中...:movie_camera:
+:movie_camera:示例demo加载中:
 <div align="center">
-  <img src="./image/乒乓球.gif" width="550px"/><br>
+  <img src="./image/where_soccer.gif" width="550px"/><br>
+  <img src="./image/where_ski.gif" width="550px"/><br>
 </div>
 
 &emsp; “where”模块重点分析：前景（运动员）、背景（场馆）、相机，这三类对象的位置/位姿的信息：
@@ -136,7 +137,7 @@ demo加载中...:movie_camera:
 
 
 ## 3. [*who*](./03-sports_who/)
-demo加载中...:movie_camera:
+:movie_camera:demo加载中:
 <div align="center">
   <img src="./image/乒乓球.gif" width="550px"/><br>
 </div>
