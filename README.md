@@ -65,6 +65,7 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 <div align="center">
   <img src="./image/where_soccer.gif" width="550px"/><br>
   <img src="./image/where_ski.gif" width="550px"/><br>
+  <img src="./image/where_3D.gif" width="550px"/><br>
 </div>
 
 &emsp; “where”模块重点分析：前景（运动员）、背景（场馆）、相机，这三类对象的位置/位姿的信息：
@@ -139,7 +140,8 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 ## 3. [*who*](./03-sports_who/)
 :movie_camera:demo加载中:
 <div align="center">
-  <img src="./image/乒乓球.gif" width="550px"/><br>
+  <img src="./image/who_face.gif" width="550px"/><br>
+  <img src="./image/who_line.gif" width="550px"/><br>
 </div>
 
 &emsp; “who”模块重点分析：图像/视频中有哪几类人员，分别是谁，特定人员在整场比赛的集锦等信息：
@@ -161,9 +163,11 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 4. [*what*](./04-sports_what/)
-demo加载中...:movie_camera:
+:movie_camera:demo加载中:
 <div align="center">
-  <img src="./image/乒乓球.gif" width="550px"/><br>
+  <img src="./image/what_super.png" width="550px"/><br>
+  <img src="./image/what_pt2.png" width="550px"/><br>
+  <img src="./image/what_imgen.png" width="550px"/><br>
 </div>
 
 &emsp; “what”模块重点分析体育比赛画面中呈现的信息，包含：运动、语音、视觉、多模态等：
