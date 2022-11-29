@@ -3,12 +3,17 @@
 
 ## 📣 近期更新
 
-- **🔥2022.11.30 发布 足球"AI懂球帝"以及相关案例库 [10-applications/01-football](./10-applications/01-football/)**
+- **🔥2022.11.30 发布 足球"AI懂球帝"以及相关[案例库](./10-applications/01-football/)**
   - 亮相WAVE SUMMIT<sup>+</sup>大会AI开发者集市，敬请关注；
   - 涵盖四大板块超15种算法及足球领域解决方案；
   - 💥"AI懂球帝"带你看世界杯 -- 卡塔尔世界杯示例demo更新;
 
 # 框架介绍
+
+<div align="center">
+  <img src="./image/1.gif" width="300px"/> <img src="./image/3.gif" width="300px"/> <img src="./image/4.gif" width="300px"/><br>
+</div>
+
 PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工智能技术与体育行业的深度融合，目标打造“AI+Sports”的标杆案例集。PaddleSports的特色如下：
 
 1. 整体采用“5W1H”的产品架构，即：[*when*](#1-when)（什么时间），[*where*](#2-where)（什么位置），[*who*](#3-who)（是谁），[*what*](#4-what)（发生了什么），[*why*](#5-why)（为什么），[*how*](#6-how)（怎么样）。系统梳理人工智能技术在体育行业的研究、应用、落地。
