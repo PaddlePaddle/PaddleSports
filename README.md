@@ -1,5 +1,13 @@
 # PaddleSports
 
+
+## 📣 近期更新
+
+- **🔥2022.11.30 发布 足球"AI懂球帝"以及相关案例库 [10-applications/01-football](./10-applications/01-football/)**
+  - 亮相WAVE SUMMIT<sup>+</sup>大会AI开发者集市，敬请关注；
+  - 涵盖四大板块超20种算法及足球领域解决方案；
+  - 💥"AI懂球帝"带你看世界杯 -- 卡塔尔世界杯示例demo更新;
+
 # 框架介绍
 PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工智能技术与体育行业的深度融合，目标打造“AI+Sports”的标杆案例集。PaddleSports的特色如下：
 
@@ -16,7 +24,6 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 # 分模块介绍
 该部分详细介绍“5W1H”各个模块的内容。
-
 
 ## 1. [*when*](./01-sports_when/)
 :movie_camera:示例demo加载中: [下载](./image/)
@@ -61,7 +68,7 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 2. [*where*](./02-sports_where/)
-:movie_camera:示例demo加载中:
+:movie_camera:示例demo加载中: 
 <div align="center">
   <img src="./image/where_soccer.gif" width="550px"/><br>
   <img src="./image/where_ski.gif" width="550px"/><br>
@@ -138,7 +145,7 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 3. [*who*](./03-sports_who/)
-:movie_camera:demo加载中:
+:movie_camera:示例demo加载中:
 <div align="center">
   <img src="./image/who_face.gif" width="550px"/><br>
   <img src="./image/who_line.gif" width="550px"/><br>
@@ -163,10 +170,10 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 4. [*what*](./04-sports_what/)
-:movie_camera:demo加载中:
+:movie_camera:示例demo加载中: （超分, 图生文, 图片虚拟合成）
 <div align="center">
   <img src="./image/what_super.png" width="550px"/><br>
-  <img src="./image/what_pt2.png" width="550px"/><br>
+  <img src="./image/what_p2t.png" width="550px"/><br>
   <img src="./image/what_imgen.png" width="550px"/><br>
 </div>
 
@@ -219,7 +226,7 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 
-## 5. [*why*](./05-sports_why/)
+## 5. [*why*](./05-sports_why/) 
 
 &emsp; “why”模块重点分析影响运动表现的因素，并尝试预测伤病的可能性、比赛成绩等：
 
@@ -239,7 +246,7 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 
-## 6. [*how*](./06-sports_how/)
+## 6. [*how*](./06-sports_how/) 
 
 &emsp; “how”模块重点分析影响“AI+Sports”技术落地的因素：
 
@@ -259,7 +266,7 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 
-## 7. [*data*](./07-data/)
+## 7. [*data*](./07-data/) 
 
 &emsp; “data”模块重点梳理生成训练数据的6种主流方式：
 
@@ -287,7 +294,7 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 
-## 8. [*benchmark*](./08-benchmarks/)
+## 8. [*benchmark*](./08-benchmarks/) 
 
 &emsp; “benchmark”模块将构建第一个体育类的benchmark，尽可能让所有算法在一个数据集上进行评测，特点是小而精，包含以下信息：
 
@@ -307,7 +314,7 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 |                 |                    |                             |                                                     |
 
 
-## 9. [*tools*](./09-tools/)
+## 9. [*tools*](./09-tools/) 
 
 &emsp; 面向体育场景的工具集，比如标注工具、检测工具、识别工具等，具有All-in-One，AutoRun的特点。
 
