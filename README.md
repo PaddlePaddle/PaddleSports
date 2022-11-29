@@ -19,9 +19,13 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 1. [*when*](./01-sports_when/)
-乒乓球demo加载中...:movie_camera:
+:movie_camera:demo加载中: [下载](./image/)
 <div align="center">
   <img src="./image/乒乓球.gif" width="550px"/><br>
+</div>
+示例截图:
+<div align="center">
+  <img src="./image/乒乓球.png" width="550px"/><br>
 </div>
 
 &emsp; “when”模块重点从时域角度回答以下问题：
@@ -57,6 +61,10 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 2. [*where*](./02-sports_where/)
+demo加载中...:movie_camera:
+<div align="center">
+  <img src="./image/乒乓球.gif" width="550px"/><br>
+</div>
 
 &emsp; “where”模块重点分析：前景（运动员）、背景（场馆）、相机，这三类对象的位置/位姿的信息：
 
@@ -128,7 +136,10 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 3. [*who*](./03-sports_who/)
-
+demo加载中...:movie_camera:
+<div align="center">
+  <img src="./image/乒乓球.gif" width="550px"/><br>
+</div>
 
 &emsp; “who”模块重点分析：图像/视频中有哪几类人员，分别是谁，特定人员在整场比赛的集锦等信息：
 
@@ -149,6 +160,10 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 4. [*what*](./04-sports_what/)
+demo加载中...:movie_camera:
+<div align="center">
+  <img src="./image/乒乓球.gif" width="550px"/><br>
+</div>
 
 &emsp; “what”模块重点分析体育比赛画面中呈现的信息，包含：运动、语音、视觉、多模态等：
 
@@ -293,7 +308,7 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 | 任务              | 技术方向               | 技术细分                        | 算法模型                                                |
 |-----------------|--------------------|-----------------------------|-----------------------------------------------------|
-| 9.tools         | 9.1) 标注工具          |                             |                                                     |
+| 9.tools         | 9.1) 标注工具          |百度智能标注系统（BILS）        |交互式智能视频标注平台                                                     |
 |                 | 9.2) 检测工具          |                             |                                                     |
 |                 | 9.3) 识别工具          |                             |                                                     |
 |                 | 9.4) 深度图生成工具       |                             |                                                     |
