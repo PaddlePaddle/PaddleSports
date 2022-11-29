@@ -19,7 +19,7 @@ PaddleSports是飞桨面向体育场景的端到端开发套件，实现人工�
 
 
 ## 1. [*when*](./01-sports_when/)
-
+乒乓球demo加载中...:movie_camera:
 <div align="center">
   <img src="./image/乒乓球.gif" width="550px"/><br>
 </div>
