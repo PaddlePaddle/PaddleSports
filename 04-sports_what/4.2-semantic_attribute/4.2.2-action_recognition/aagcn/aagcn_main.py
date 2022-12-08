@@ -37,7 +37,7 @@ class AAGCN_main():
                 # out = nn.Softmax()(out)
                 # out = paddle.multinomial(out, num_samples=1, replacement=False, name=None)
                 acc = paddle.metric.accuracy(out,cls.unsqueeze(1))
-                # acc_all+=acc.numpy()[0]
+                # acc_all+=float(acc)
                 acc_all+=float(acc)
                 num+=1
             # if out[0] == cls:
@@ -77,7 +77,7 @@ class AAGCN_main():
                 self.log_writer.add_scalar(tag='train/loss', step=i, value=float(loss))
 
                 if i%100 == 3:
-                    # print("loss",loss.numpy()[0],v_acc_max)
+                    # print("loss",float(loss),v_acc_max)
                     print("loss",float(loss),v_acc_max)
                 i+=1
                 # break
@@ -86,7 +86,7 @@ class AAGCN_main():
                 aagcn.eval()
                 v_acc = self.valid_accurary(valid_loader,aagcn)
                 aagcn.train()
-                # print("epoch loss",loss.numpy()[0],v_acc)
+                # print("epoch loss",float(loss),v_acc)
                 print("epoch loss",float(loss),v_acc)
                 self.log_writer.add_scalar(tag='train/v_acc', step=i, value=v_acc)
                 if v_acc > v_acc_max:
