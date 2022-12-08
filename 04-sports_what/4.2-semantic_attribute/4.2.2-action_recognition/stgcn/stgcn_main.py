@@ -36,7 +36,7 @@ class STGCN_main():
                 # out = nn.Softmax()(out)
                 # out = paddle.multinomial(out, num_samples=1, replacement=False, name=None)
                 acc = paddle.metric.accuracy(out,cls.unsqueeze(1))
-                acc_all+=acc.numpy()[0]
+                acc_all+=float(acc)
                 num+=1
             # if out[0] == cls:
                 # right +=1
