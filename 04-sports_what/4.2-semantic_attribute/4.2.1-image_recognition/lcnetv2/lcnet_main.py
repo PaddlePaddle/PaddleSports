@@ -37,7 +37,7 @@ class LCNet_main():
                 img_data =paddle.transpose(x=img_data,perm=[0,3,1,2])
                 out = classifer_net(img_data)
                 acc = paddle.metric.accuracy(out,cls.unsqueeze(1))
-                acc_all+=acc.numpy()[0]
+                acc_all+=float(acc)
                 num+=1
                 if num == 10 and self.is_train== True:
                     break
