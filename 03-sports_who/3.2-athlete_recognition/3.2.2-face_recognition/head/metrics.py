@@ -234,7 +234,8 @@ class Am_softmax(nn.Layer):
         cos_theta = paddle.clip(cos_theta, min=-1, max=1)  # for numerical stability
         phi = cos_theta - self.m
         label = label.reshape((-1, 1))  # size=(B,1)
-        index = paddle.to_tensor(cos_theta.numpy()[0] * 0.0)  # size=(B,Classnum)
+        #index = paddle.to_tensor(cos_theta.numpy()[0] * 0.0)  # size=(B,Classnum)
+        index = paddle.to_tensor(float(cos_theta) * 0.0)  # size=(B,Classnum)
         index.scatter_(1, label.reshape((-1, 1)), 1)
         # ###index = index.byte()
         index = index.astpye(dtype='uint8')
