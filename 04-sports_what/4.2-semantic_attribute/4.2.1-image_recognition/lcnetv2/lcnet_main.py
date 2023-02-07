@@ -77,7 +77,7 @@ class LCNet_main():
                 optimizer.step()
 
 
-                self.log_writer.add_scalar(tag='train/loss', step=i, value=loss.numpy()[0])
+                self.log_writer.add_scalar(tag='train/loss', step=i, value=float(loss))
 
 
                 if i%100 == 3:
